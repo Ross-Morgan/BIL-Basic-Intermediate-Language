@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import sys
 from abc import ABC, abstractmethod
-from typing import Iterable, Protocol, Type, TypeVar
+from typing import Iterable, Protocol, Type
 
 from data import Constant, Mode, Variable
 from tokens import Tokens
@@ -17,9 +19,9 @@ class HasVariableValue(Protocol):
 
 
 class AbstractASMWriter(ABC):
-    platform_writers: dict = {}
+    platform_writers: dict[str, Type[AbstractASMWriter]] = {}
 
-    def __init_subclass__(cls, platform: str) -> None:
+    def __init_subclass__(cls, platform: str | list[str]) -> None:
         if isinstance(platform, str):
             AbstractASMWriter.platform_writers[platform] = cls
         else:
@@ -72,10 +74,7 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         lines.insert(0, "section .data")
 
 
-W = TypeVar("W", bound=AbstractASMWriter)
-
-
-def new_writer(*, platform: str = sys.platform) -> Type[W]:
+def new_writer(*, platform: str = sys.platform) -> AbstractASMWriter:
     """
     Writer factory, returning a platform-specific
     subclass of AbstractASMWriter
