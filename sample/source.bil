@@ -1,0 +1,17 @@
+symbols:
+  constants:
+    E: 2.718281828
+    PI: 3.14159265
+    PHI: 1.6180339
+    name: "Ross"
+
+  variables:
+    x: 10
+    y: -25
+    z: 5
+    c: 10i
+
+entry:
+  mode print
+  load :E
+  run
