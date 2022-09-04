@@ -82,6 +82,3 @@ def new_writer(*, platform: str = sys.platform) -> Type[W]:
     """
     writer = AbstractASMWriter.platform_writers[platform]
     return writer()
-
-
-linux_writer = new_writer()
