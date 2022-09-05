@@ -21,12 +21,34 @@ class HasVariableValue(Protocol):
 class AbstractASMWriter(ABC):
     platform_writers: dict[str, Type[AbstractASMWriter]] = {}
 
+    constant_lines: list[str]
+    variable_lines: list[str]
+    text_lines: list[str]
+
     def __init_subclass__(cls, platform: str | list[str]) -> None:
         if isinstance(platform, str):
             AbstractASMWriter.platform_writers[platform] = cls
         else:
             for plat_name in platform:
                 AbstractASMWriter.platform_writers[plat_name] = cls
+
+    @classmethod
+    def parse_data(cls, data: Constant | Variable) -> str:
+        print(data, type(data))
+
+        if isinstance(data.value, str):
+            return f"{data.name} dw {cls.parse_value(data.value)}"
+        if isinstance(data.value, Iterable):
+            parsed_values = [cls.parse_value(v) for v in data.value]
+            return f"{data.name} dw {', '.join(parsed_values)}"
+        return f"{data.name} dw {cls.parse_value(data.value)}"
+
+    @classmethod
+    def parse_value(cls, value: object) -> str:
+        if isinstance(value, str):
+            return f"'{value}'"
+
+        return value
 
     @property
     @classmethod
@@ -39,8 +61,7 @@ class AbstractASMWriter(ABC):
 
     @abstractmethod
     def write_constants(self, constants: Iterable[HasConstantValue]):
-        for const in constants:
-            const.value
+        pass
 
     @abstractmethod
     def write_variables(self, variables: Iterable[HasVariableValue]):
@@ -65,13 +86,21 @@ class WindowsWriter(AbstractASMWriter, platform="win32"):
 
 class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
     def __init__(self):
-        self.constant_lines = []
+        self.constant_lines = ["section .data"]
         self.variable_lines = []
         self.text_lines = []
 
     def write_constants(self, constants: Iterable[HasConstantValue]):
-        lines = [f"  {const.value}" for const in constants]
-        lines.insert(0, "section .data")
+        self.constant_lines.extend([f"  {const.value.name} equ {self.parse_value(const.value.value)}" for const in constants])
+
+    def write_variables(self, variables: Iterable[HasVariableValue]):
+        self.variable_lines.extend([f"  {self.parse_data(var.value)}" for var in variables])
+
+    def change_mode(self, mode: Mode):
+        return super().change_mode(mode)
+
+    def output(self):
+        return super().output()
 
 
 def new_writer(*, platform: str = sys.platform) -> AbstractASMWriter:

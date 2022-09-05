@@ -17,8 +17,8 @@ A regular asm program to stdout may look like this:
 
 ```x86asm
 section .data
-  string: db "Hello World!", 10
-  stringLength: equ $-hello
+  string db "Hello World!", 10
+  stringLength equ $-hello
 
 section .text
   global _start
