@@ -88,7 +88,7 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
     def __init__(self):
         self.constant_lines = ["section .data"]
         self.variable_lines = []
-        self.text_lines = []
+        self.text_lines = ["section .text", "  global _start", "", "  _start:"]
 
     def write_constants(self, constants: Iterable[HasConstantValue]):
         self.constant_lines.extend([f"  {const.value.name} equ {self.parse_value(const.value.value)}" for const in constants])
@@ -97,16 +97,16 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         self.variable_lines.extend([f"  {self.parse_data(var.value)}" for var in variables])
 
     def change_mode(self, mode: Mode):
-        return super().change_mode(mode)
+        self.text_lines.append(f"    ")
 
     def output(self):
         return super().output()
 
 
-def new_writer(*, platform: str = sys.platform) -> AbstractASMWriter:
+def new_writer(*, platform: str = sys.platform) -> Type[AbstractASMWriter]:
     """
     Writer factory, returning a platform-specific
     subclass of AbstractASMWriter
     """
     writer = AbstractASMWriter.platform_writers[platform]
-    return writer()
+    return writer

@@ -11,7 +11,8 @@ def main():
     parser = Parser(tokens)
     parser.parse()
 
-    writer = new_writer()
+    platform_writer = new_writer()
+    writer = platform_writer()
 
     writer.write_constants(parser.constant_tokens)
     writer.write_variables(parser.variable_tokens)
