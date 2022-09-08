@@ -32,6 +32,11 @@ class AbstractASMWriter(ABC):
             for plat_name in platform:
                 AbstractASMWriter.platform_writers[plat_name] = cls
 
+    @property
+    @classmethod
+    def supported_platforms(cls) -> list[str]:
+        return list(cls.platform_writers)
+
     @classmethod
     def parse_data(cls, data: Constant | Variable) -> str:
         print(data, type(data))
@@ -49,11 +54,6 @@ class AbstractASMWriter(ABC):
             return f"'{value}'"
 
         return value
-
-    @property
-    @classmethod
-    def supported_platforms(cls) -> list[str]:
-        return list(cls.platform_writers)
 
     @abstractmethod
     def __init__(self):
