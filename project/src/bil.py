@@ -11,13 +11,13 @@ def main():
     parser = Parser(tokens)
     parser.parse()
 
-    writer = new_writer()
+    print(parser.constant_tokens)
+    print(parser.variable_tokens)
 
+    writer = new_writer("project/sample/output.asm", platform="linux")
     writer.write_constants(parser.constant_tokens)
     writer.write_variables(parser.variable_tokens)
 
-    print(writer.constant_lines)
-    print(writer.variable_lines)
 
 
 if __name__ == "__main__":
