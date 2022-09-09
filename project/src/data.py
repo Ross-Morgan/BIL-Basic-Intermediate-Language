@@ -15,6 +15,11 @@ class Constant:
 
 
 @dataclass
+class ComplexReference:
+    re_ref: str
+    im_ref: str
+
+@dataclass
 class Reference:
     ref_to: str
 
