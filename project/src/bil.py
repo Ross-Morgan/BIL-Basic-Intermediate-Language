@@ -11,12 +11,14 @@ def main():
     parser = Parser(tokens)
     parser.parse()
 
+<<<<<<< HEAD
     print(parser.constant_tokens)
     print(parser.variable_tokens)
+=======
+    platform_writer = new_writer()
+    writer = platform_writer()
+>>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
 
-    writer = new_writer("project/sample/output.asm", platform="linux")
-    writer.write_constants(parser.constant_tokens)
-    writer.write_variables(parser.variable_tokens)
 
 
 

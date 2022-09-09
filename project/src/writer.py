@@ -41,6 +41,11 @@ class AbstractASMWriter(ABC):
             for plat_name in platform:
                 AbstractASMWriter.platform_writers[plat_name] = cls
 
+    @property
+    @classmethod
+    def supported_platforms(cls) -> list[str]:
+        return list(cls.platform_writers)
+
     @classmethod
     def parse_data(cls, data: Constant | Variable) -> str:
         print(data, type(data))
@@ -57,11 +62,6 @@ class AbstractASMWriter(ABC):
         if isinstance(value, str):
             return f"'{value}'"
         return value
-
-    @property
-    @classmethod
-    def supported_platforms(cls) -> list[str]:
-        return list(cls.platform_writers)
 
     @abstractmethod
     def __init__(self, filename: str):
@@ -97,8 +97,13 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         self.file = ASMFile(filename)
 
         self.constant_lines = ["section .data"]
+<<<<<<< HEAD
         self.variable_lines = ["section .bss"]
         self.text_lines = []
+=======
+        self.variable_lines = []
+        self.text_lines = ["section .text", "  global _start", "", "  _start:"]
+>>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
 
     def write_constants(self, constants: Iterable[HasConstantValue]):
         self.constant_lines.extend([f"  {const.value.name} equ {self.parse_value(const.value.value)}" for const in constants])
@@ -107,16 +112,24 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         self.variable_lines.extend([f"  {var.value.name}: {self.parse_value(var.value.value)}" for var in variables])
 
     def change_mode(self, mode: Mode):
-        return super().change_mode(mode)
+        self.text_lines.append(f"    ")
 
     def output(self):
         return super().output()
 
 
+<<<<<<< HEAD
 def new_writer(filename: str, *, platform: str = sys.platform) -> AbstractASMWriter:
+=======
+def new_writer(*, platform: str = sys.platform) -> Type[AbstractASMWriter]:
+>>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
     """
     Writer factory, returning a platform-specific
     subclass of AbstractASMWriter
     """
     writer = AbstractASMWriter.platform_writers[platform]
+<<<<<<< HEAD
     return writer(filename)
+=======
+    return writer
+>>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
