@@ -121,8 +121,8 @@ class Lexer:
         if VARIABLES_SEC_MARKER not in lines:
             raise ValueError(f"`symbols:` section missing `{VARIABLES_SEC_MARKER.strip()}` marker")  # noqa
 
-        while "" in lines:
-            lines.remove("")
+        # Remove all empty lines
+        lines = list(filter(bool, lines))
 
         const_lines = lines[:lines.index(VARIABLES_SEC_MARKER)]
         vari_lines = lines[lines.index(VARIABLES_SEC_MARKER):]
@@ -203,7 +203,7 @@ class Lexer:
 
 
 def main():
-    lexer = Lexer("sample/source.bil")
+    lexer = Lexer("project/sample/source.bil")
     tokens = list(lexer.make_tokens())
 
     print(*tokens, sep="\n")
