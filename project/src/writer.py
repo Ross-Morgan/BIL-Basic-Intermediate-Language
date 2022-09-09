@@ -18,6 +18,15 @@ class HasVariableValue(Protocol):
     value: Variable
 
 
+class ASMFile:
+    def __init__(self, path: str):
+        self.filepath = path
+        self.file = open(self.filepath, "w+")
+
+    def __del__(self):
+        self.file.close()
+
+
 class AbstractASMWriter(ABC):
     platform_writers: dict[str, Type[AbstractASMWriter]] = {}
 
@@ -47,7 +56,6 @@ class AbstractASMWriter(ABC):
     def parse_value(cls, value: object) -> str:
         if isinstance(value, str):
             return f"'{value}'"
-
         return value
 
     @property
@@ -56,7 +64,7 @@ class AbstractASMWriter(ABC):
         return list(cls.platform_writers)
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self, filename: str):
         pass
 
     @abstractmethod
@@ -85,16 +93,18 @@ class WindowsWriter(AbstractASMWriter, platform="win32"):
 
 
 class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
-    def __init__(self):
+    def __init__(self, filename: str):
+        self.file = ASMFile(filename)
+
         self.constant_lines = ["section .data"]
-        self.variable_lines = []
+        self.variable_lines = ["section .bss"]
         self.text_lines = []
 
     def write_constants(self, constants: Iterable[HasConstantValue]):
         self.constant_lines.extend([f"  {const.value.name} equ {self.parse_value(const.value.value)}" for const in constants])
 
     def write_variables(self, variables: Iterable[HasVariableValue]):
-        self.variable_lines.extend([f"  {self.parse_data(var.value)}" for var in variables])
+        self.variable_lines.extend([f"  {var.value.name}: {self.parse_value(var.value.value)}" for var in variables])
 
     def change_mode(self, mode: Mode):
         return super().change_mode(mode)
@@ -103,10 +113,10 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         return super().output()
 
 
-def new_writer(*, platform: str = sys.platform) -> AbstractASMWriter:
+def new_writer(filename: str, *, platform: str = sys.platform) -> AbstractASMWriter:
     """
     Writer factory, returning a platform-specific
     subclass of AbstractASMWriter
     """
     writer = AbstractASMWriter.platform_writers[platform]
-    return writer()
+    return writer(filename)
