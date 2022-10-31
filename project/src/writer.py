@@ -97,13 +97,9 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         self.file = ASMFile(filename)
 
         self.constant_lines = ["section .data"]
-<<<<<<< HEAD
         self.variable_lines = ["section .bss"]
         self.text_lines = []
-=======
-        self.variable_lines = []
-        self.text_lines = ["section .text", "  global _start", "", "  _start:"]
->>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
+
 
     def write_constants(self, constants: Iterable[HasConstantValue]):
         self.constant_lines.extend([f"  {const.value.name} equ {self.parse_value(const.value.value)}" for const in constants])
@@ -118,18 +114,11 @@ class LinuxWriter(AbstractASMWriter, platform=["linux", "linux2"]):
         return super().output()
 
 
-<<<<<<< HEAD
 def new_writer(filename: str, *, platform: str = sys.platform) -> AbstractASMWriter:
-=======
-def new_writer(*, platform: str = sys.platform) -> Type[AbstractASMWriter]:
->>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
     """
     Writer factory, returning a platform-specific
     subclass of AbstractASMWriter
     """
     writer = AbstractASMWriter.platform_writers[platform]
-<<<<<<< HEAD
+
     return writer(filename)
-=======
-    return writer
->>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
