@@ -11,13 +11,11 @@ def main():
     parser = Parser(tokens)
     parser.parse()
 
-<<<<<<< HEAD
     print(parser.constant_tokens)
     print(parser.variable_tokens)
-=======
+
     platform_writer = new_writer()
     writer = platform_writer()
->>>>>>> 49e39fd0a22e87caa0a2e9190798f1bb3cd3ecc2
 
 
 
